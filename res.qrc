@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="res">
+    <file>resource/桌面自动化.ico</file>
+  </qresource>
+</RCC>
