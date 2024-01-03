@@ -28,6 +28,8 @@ class MyWidget(QWidget):
         self.encryption = Encryption()
         self.secret_key = ""
 
+        self.time_log = os.path.join(os.environ['USERPROFILE'], ".timeLog")
+
     def initUI(self):
         self.ui.filePathEdit.setText(self.path)
 
@@ -49,17 +51,17 @@ class MyWidget(QWidget):
     def checkTime(self) -> bool:
         # 每次打开软件都需要检查当前打开时间和上一次打开时间间隔
         # 第一次打开
-        time_log = os.path.join(os.environ['USERPROFILE'], ".timeLog")
-        if not (os.path.exists(time_log)):
+
+        if not (os.path.exists(self.time_log)):
             # 目前解不了密
             # cur_time = self.encryption.getSecretKey()
-            with open(time_log, "w", encoding="utf-8") as f:
+            with open(self.time_log, "w", encoding="utf-8") as f:
                 f.write(str(time.time()))
             return True
 
         else:
             # 获取记录的时间
-            with open(time_log, "r", encoding="utf-8") as f:
+            with open(self.time_log, "r", encoding="utf-8") as f:
                 start_time = f.readline()
 
             # 如果超过8小时，则需要重新生成密钥
@@ -94,9 +96,18 @@ class MyWidget(QWidget):
     def on_runBtn_clicked(self, checked):
         # 检查时间
         check_time = self.checkTime()
+
+        # 超过限制时间
         if not check_time:
-            QMessageBox.warning(self, "警告", "密钥已过期，请重新生成密钥")
-            return
+
+            # 检查密码是否正确，如果正确，更新系统中的时间
+            check_res = self.checkPwd()
+            if (check_res[0]):
+                with open(self.time_log, "w", encoding="utf-8") as f:
+                    f.write(str(time.time()))
+            else:
+                QMessageBox.warning(self, "警告", "密钥已过期，请重新生成密钥")
+                return
 
         # 检查密码
         check_res = self.checkPwd()
@@ -138,6 +149,12 @@ class MyWidget(QWidget):
 
         # 执行
         box.exec()
+
+    # 键盘相应函数
+    # ctrl + q快速停止
+    def keyPressEvent(self, event):
+        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_Q:
+            self.on_stopBtn_clicked(True)
 
 
 if __name__ == '__main__':

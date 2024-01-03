@@ -304,10 +304,16 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
 
         # 打开软件
         elif command_key == "打开软件":
+            # 打开软件的盘符位置
+            drive_location = command_value[0]
+
+            # 获取软件根目录和软件名
             split_text = command_value.split("\\")
             root = "\\".join(split_text[:-1])
             name = split_text[-1]
-            os.system("cd {} & start {}".format(root, name))
+
+            # 进入盘符位置并打开软件
+            os.system("{} & cd {} & start {}".format(drive_location, root, name))
 
         # 关闭软件
         elif command_key == "关闭软件":
@@ -325,7 +331,9 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
         # 如果输入新建文件夹
         # 新建文件夹 = C:\yan\1-400
         elif command_key == "新建文件夹":
-            root, names = command_value.split("\\")
+            value_split = command_value.split("\\")
+            root = "\\".join(value_split[:-1])
+            names = value_split[-1]
             split_text = names.split("-")
             if len(split_text) != 2:
                 pyautogui.alert(text="未指定起始终止文件夹", title="错误")

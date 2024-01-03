@@ -19,8 +19,8 @@ class Encryption:
         mod = 'MD5'
         h = hmac.new(b_k, b_t, mod)
 
-        # 返回的16进制
-        secret_key = str(h.hexdigest())
+        # 返回的16进制的前八位
+        secret_key = str(h.hexdigest())[:8]
 
         return secret_key
 
@@ -34,5 +34,5 @@ class Encryption:
 
 if __name__ == '__main__':
     encryption = Encryption()
-    secret_key = "3343ff459c078adae87042f4b44a7984"
+    secret_key = "b60fb87e"
     print(encryption.createPwd(secret_key))
