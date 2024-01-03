@@ -34,5 +34,5 @@ class Encryption:
 
 if __name__ == '__main__':
     encryption = Encryption()
-    secret_key = "b60fb87e"
+    secret_key = "e3dd6f31"
     print(encryption.createPwd(secret_key))

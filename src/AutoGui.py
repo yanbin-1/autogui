@@ -313,7 +313,7 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
             name = split_text[-1]
 
             # 进入盘符位置并打开软件
-            os.system("{} & cd {} & start {}".format(drive_location, root, name))
+            os.system("{}: & cd {} & start {}".format(drive_location, root, name))
 
         # 关闭软件
         elif command_key == "关闭软件":
