@@ -261,21 +261,31 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
             pyautogui.moveRel(offset_x, offset_y)
 
         # 按住鼠标
-        elif command_key == "按住左键":
+        elif command_key == "鼠标按住左键移动":
             # 获取目标点像素点
             coordinate = command_value.split("/")
             location_x = int(coordinate[0].strip())
             location_y = int(coordinate[1].strip())
 
-            pyautogui.mouseDown(location_x, location_y, "left")
+            pyautogui.dragTo(location_x, location_y, duration=1, button="left")
 
-        elif command_key == "鼠标拖动":
+        # 按住鼠标
+        elif command_key == "鼠标按住右键移动":
             # 获取目标点像素点
             coordinate = command_value.split("/")
             location_x = int(coordinate[0].strip())
             location_y = int(coordinate[1].strip())
 
-            pyautogui.dragTo(100, 300, duration=1)
+            pyautogui.dragTo(location_x, location_y, duration=1, button="right")
+
+        # 按住鼠标
+        elif command_key == "鼠标按住中键移动":
+            # 获取目标点像素点
+            coordinate = command_value.split("/")
+            location_x = int(coordinate[0].strip())
+            location_y = int(coordinate[1].strip())
+
+            pyautogui.dragTo(location_x, location_y, duration=1, button="mid")
 
         elif command_key == "检测文件出现":
             detectFile(command_value)
@@ -366,7 +376,6 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
 
             # 创建文件夹
             [os.mkdir(os.path.join(root, str(name))) for name in range(start_name, end_name + 1)]
-
 
         # 等待
         time.sleep(interval)
