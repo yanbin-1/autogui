@@ -170,7 +170,7 @@ def detectFile(command_value, method=1):
                 time.sleep(0.1)
 
 
-def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
+def executeCommand(img_path: str, command_dict: dict, interval: float) -> Union[None, bool]:
     """
     根据给的那个参数执行相应逻辑命令
     定位图片中心、移动、偏移、左键、右键、中键、输入、按住、松开、检测（暂定给定图片检测出现和消失的瞬间）、
@@ -285,7 +285,13 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
             location_x = int(coordinate[0].strip())
             location_y = int(coordinate[1].strip())
 
-            pyautogui.dragTo(location_x, location_y, duration=1, button="mid")
+            pyautogui.dragTo(location_x, location_y, duration=1, button="middle")
+
+        elif command_key == "鼠标滚轮上移":
+            pyautogui.vscroll(int(command_value))
+
+        elif command_key == "鼠标滚轮下移":
+            pyautogui.vscroll(-(int(command_value)))
 
         elif command_key == "检测文件出现":
             detectFile(command_value)
@@ -377,6 +383,9 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> None:
             # 创建文件夹
             [os.mkdir(os.path.join(root, str(name))) for name in range(start_name, end_name + 1)]
 
+        elif command_key == "停止":
+            return True if command_value == "是" else False
+
         # 等待
         time.sleep(interval)
 
@@ -399,6 +408,9 @@ def runGui(path, part_cycle_start, part_cycle_end, part_cycle_time, all_cycle_ti
         part_cycle_start -= 2
         part_cycle_end -= 2
         i = 0
+
+        # stop flag
+        stop_flag = False
 
         try:
             while i < df.shape[0]:
@@ -427,7 +439,10 @@ def runGui(path, part_cycle_start, part_cycle_end, part_cycle_time, all_cycle_ti
 
                 # 执行
                 for _ in range(times):
-                    executeCommand(img_path, command_dict, interval)
+                    stop_flag = executeCommand(img_path, command_dict, interval)
+
+                if stop_flag:
+                    break
 
                 # 运行到循环结束区间
                 if i == part_cycle_end and part_cycle_time != 1:
@@ -443,10 +458,5 @@ def runGui(path, part_cycle_start, part_cycle_end, part_cycle_time, all_cycle_ti
 
 
 if __name__ == '__main__':
-    # path = r"E:\Code\temp"
-    # names = os.listdir(path)
-    # detectFile(" && ".join([os.path.join(path, name) for name in names]) + " && E:\\Code\\temp\\test5.txt")
-
-    string = "$getNum123$addNumfbaxx$subNumxx"
-    data = {"1": string}
-    executeCommand("", data, 0.1)
+    path = r"F:\software\example.xlsx"
+    runGui(path, -1, -1, -1, 1)
