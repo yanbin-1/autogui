@@ -14,7 +14,7 @@
    <string>桌面自动化工具</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../res.qrc">
+   <iconset resource="res.qrc">
     <normaloff>:/res/resource/桌面自动化.ico</normaloff>:/res/resource/桌面自动化.ico</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -145,7 +145,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../res.qrc"/>
+  <include location="res.qrc"/>
  </resources>
  <connections/>
 </ui>

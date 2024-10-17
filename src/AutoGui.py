@@ -11,8 +11,8 @@ from typing import Union
 def replaceRunNum(string: str, sub_string: str) -> str:
     # 方法字典
     run_num_dict = {
-        "$addNum": GetRunNum.addRunNum,
-        "$subNum": GetRunNum.subRunNum
+        "$addNum": RunNum.addRunNum,
+        "$subNum": RunNum.subRunNum,
     }
 
     value_ = ""
@@ -23,7 +23,7 @@ def replaceRunNum(string: str, sub_string: str) -> str:
             run_num_dict[sub_string]()
 
             # 替换
-            value_ += str(GetRunNum.getRunNum())
+            value_ += str(RunNum.getRunNum())
 
             # 左右指针向前移动
             left = right
@@ -42,7 +42,7 @@ def replaceRunNum(string: str, sub_string: str) -> str:
     return value_
 
 
-class GetRunNum:
+class RunNum:
     # 全局计数器
     __run_num = 1
 
@@ -57,6 +57,30 @@ class GetRunNum:
     @classmethod
     def getRunNum(cls):
         return cls.__run_num
+
+    @classmethod
+    def setRunNum(cls, run_num):
+        cls.__run_num = run_num
+
+
+class FileRow:
+    __row = 0
+
+    @classmethod
+    def addRowNum(cls):
+        cls.__row += 1
+
+    @classmethod
+    def subRowNum(cls):
+        cls.__row -= 1
+
+    @classmethod
+    def getRowNum(cls):
+        return cls.__row
+
+    @classmethod
+    def setRowNum(cls, row):
+        cls.__row = row
 
 
 def myLog(*BUF, log_method=1):
@@ -170,6 +194,22 @@ def detectFile(command_value, method=1):
                 time.sleep(0.1)
 
 
+def copyFileContent(file_path, row):
+    """
+    读取文本的第某行
+    Args:
+        file_path: 文件路径
+        row: 第几行 从1开始
+
+    Returns:
+
+    """
+    with open(file_path, "r") as f:
+        contents = f.readlines()
+
+    pyperclip.copy(str(round(float(contents[row - 1].strip()))))
+
+
 def executeCommand(img_path: str, command_dict: dict, interval: float) -> Union[None, bool]:
     """
     根据给的那个参数执行相应逻辑命令
@@ -190,25 +230,41 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> Union[
     Returns:
 
     """
+    global ROW
     # 是否可以移动到图片
     move_flag = True
 
     for command_key, command_value in command_dict.items():
+        # 设置全局计数变量
+        if "$setNum" in command_key:
+            RunNum.setRunNum(int(round(float(command_value))))
+
+        # 使用全局计数变量
         if "$getNum" in command_value:
-            input_num = str(GetRunNum.getRunNum())
+            input_num = str(RunNum.getRunNum())
             command_value = command_value.replace("$getNum", input_num)
 
         # 如果输入全局计数器
         if "$addNum" == command_value:
-            GetRunNum.addRunNum()
+            RunNum.addRunNum()
         # 全局计数器内嵌在语句中，将$addNum替换为相应的数
         elif "$addNum" in command_value:
             command_value = replaceRunNum(command_value, "$addNum")
 
         if "$subNum" == command_value:
-            GetRunNum.subRunNum()
+            RunNum.subRunNum()
         elif "$subNum" in command_value:
             command_value = replaceRunNum(command_value, "$subNum")
+
+        # 设置文件行数
+        if "$setRowNum" == command_key:
+            FileRow.setRowNum(int(round(float(command_value))))
+
+        # 输入文件行数
+        if "$addRowNum" == command_value:
+            FileRow.addRowNum()
+        elif "$subRowNum" == command_value:
+            FileRow.subRowNum()
 
         # show
         myLog("图片：{}，命令：{} {}".format(img_path, command_key, command_value))
@@ -385,6 +441,9 @@ def executeCommand(img_path: str, command_dict: dict, interval: float) -> Union[
 
         elif command_key == "停止":
             return True if command_value == "是" else False
+
+        elif command_key == "读取文件":
+            copyFileContent(command_value, FileRow.getRowNum())
 
         # 等待
         time.sleep(interval)

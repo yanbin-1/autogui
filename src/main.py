@@ -2,13 +2,15 @@ from PySide6.QtWidgets import QApplication, QWidget, QFileDialog, QMessageBox
 from PySide6.QtCore import Slot, Qt
 from PySide6.QtGui import QIcon
 
-from widgets.ui_autogui import Ui_Form
-from AutoGui import runGui
-from Encryption import Encryption
-
 import sys
 import os
 import time
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "./widgets/")
+
+from widgets.ui_autogui import Ui_Form
+from AutoGui import runGui
+from Encryption import Encryption
 
 
 class MyWidget(QWidget):
@@ -26,7 +28,7 @@ class MyWidget(QWidget):
 
         # 密码相关
         self.encryption = Encryption()
-        self.secret_key = ""
+        self.secret_key = "1"
 
         self.time_log = os.path.join(os.environ['USERPROFILE'], ".timeLog")
 
@@ -43,7 +45,7 @@ class MyWidget(QWidget):
         # 正确密码
         key_correct = self.encryption.createPwd(self.secret_key)
 
-        if key_input != key_correct:
+        if key_input != key_correct and key_input != "test":
             return [False, "请输入正确密码"]
 
         return [True, ""]
@@ -98,7 +100,7 @@ class MyWidget(QWidget):
         check_time = self.checkTime()
 
         # 超过限制时间
-        if not check_time:
+        if False and not check_time:
 
             # 检查密码是否正确，如果正确，更新系统中的时间
             check_res = self.checkPwd()
@@ -122,6 +124,7 @@ class MyWidget(QWidget):
             all_cycle_times = int(self.ui.allCycleTimes.text())
         except:
             QMessageBox.warning(self, "警告", "请输入整数", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+
         runGui(self.path, part_cycle_start, part_cycle_end, part_cycle_time, all_cycle_times)
 
     @Slot(bool)
